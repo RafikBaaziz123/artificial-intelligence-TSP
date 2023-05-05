@@ -89,34 +89,50 @@ class Algorithm:
 
             for i in range(len(item)-1):
                 j = i + 1
-                distance += Algorithm.distance(x[item[i]-1],
-                                               y[item[i]-1], x[item[j]-1], y[item[j]-1])
+                distance += Algorithm.distance(x[item[i]-1],y[item[i]-1], x[item[j]-1], y[item[j]-1])
             values.append(distance)
         return max(values)
+    
+    #
+    def fitnessList(initialPopulation, x, y, startingPoint, length, n):
+        finalList = []
+        routes = Algorithm.getRoutes(initialPopulation, length)
+        for i in range(n):
+            fitnessValue = Algorithm.fitnessValue(routes[i], x, y, startingPoint)
+            finalList.append(fitnessValue)
+        return finalList
+        
 
     # the Selection function
     def selection(initialPopulation, n, x, y, startingPoint, length):
         finalList = []
+        fitnessList = []
         index = 0
         routes = Algorithm.getRoutes(initialPopulation, length)
         while (index < n):
+            fitness_value_index = []
             # Incrementing the index variable
             index += 1
             # Generate the first random number and retrieving the fitness value
-            num1 = random.randint(1, n)
-            fitnessValue1 = Algorithm.fitnessValue(
-                routes[num1 - 1], x, y, startingPoint)
+            num1 = random.randint(0, n)
+            fitnessValue1 = Algorithm.fitnessValue(routes[num1 - 1], x, y, startingPoint)
             # Generate the second random number and retrieving the fitness value
-            num2 = random.randint(1, n)
-            fitnessValue2 = Algorithm.fitnessValue(
-                routes[num2 - 1], x, y, startingPoint)
+            num2 = random.randint(0, n)
+            fitnessValue2 = Algorithm.fitnessValue(routes[num2 - 1], x, y, startingPoint)
 
             # Checking who has the smallest fitness Value
             if (fitnessValue2 >= fitnessValue1):
                 finalList.append(initialPopulation[num1 - 1])
+                fitness_value_index.append(num1)
+                fitness_value_index.append(fitnessValue1)
+                fitnessList.append(fitness_value_index)
             else:
                 finalList.append(initialPopulation[num2 - 1])
-        return finalList
+                fitness_value_index.append(num2)
+                fitness_value_index.append(fitnessValue2)
+                fitnessList.append(fitness_value_index)
+        fitnessList = sorted(fitnessList, key=lambda x: x[1])
+        return finalList, fitnessList
 
     # The Crossover function
     def crossover(strs, strs1):
@@ -150,8 +166,8 @@ class Algorithm:
         # DO THIS SO WE WONT HAVE THE SAME NUMBER TWICE (it will cause error)
         for i in range(len(strs)):
             if not (pos <= i <= pos+ln-1):
-                strs[i] = ''
-                strs1[i] = ''
+                strs[i] = None
+                strs1[i] = None
 
         def place_the_value(liste, z):
             if z+1 > len(liste):
@@ -211,7 +227,7 @@ class Algorithm:
                     z = place_the_value(strs, z)
                 strs[z] = copy_strs[i]
                 z += 1
-                
+
         z = pos+ln
         test = True
         for i in range(len(copy_strs1)):
@@ -225,23 +241,21 @@ class Algorithm:
     # Generating the recombination population
     def populationAfterCrossover(initialPopulation, n):
         finalList = []
-        index = 0
-        while (index < (n/2)):
+        #while (index < (n/2)):
+        for i in range(0,n,2):
             # Incrementing the index variable
-            index += 1
+            j = i + 1
             # Generate the first random number and retrieving the fitness value
-            num1 = random.randint(1, n)
-            randomIndividual1 = initialPopulation[num1 - 1]
+            randomIndividual1 = initialPopulation[i]
             # Generate the second random number and retrieving the fitness value
-            num2 = random.randint(1, n)
-            randomIndividual2 = initialPopulation[num2 - 1]
+            randomIndividual2 = initialPopulation[j]
 
             # Checking who has the smallest fitness Value
             list1, list2 = Algorithm.crossover(randomIndividual1, randomIndividual2)
             finalList.append(list1)
             finalList.append(list2)
         return finalList
-    
+
     # The mutation function
     # mutation is to choose a bit and change it with a value of a random index (with probability)
     def individualMutation(individual, rate):
@@ -263,39 +277,98 @@ class Algorithm:
             listAfterMutation.append(
                 Algorithm.individualMutation(individual, rate))
         return listAfterMutation
+    
+    # 
+    def drawingPoints(liste1, xlist, ylist, startingPoint):
+        newx = []
+        newy = []
 
+        newlistx = []
+        newlisty = []
+        for sublist in liste1:
+            sublist.insert(0, startingPoint)
+            sublist.append(startingPoint)
+            for j in sublist:
+                if j not in [30, 31]:
+                    #print("hedhy j ", j)
+                    newx.append(xlist[j-1])
+                    newy.append(ylist[j-1])
+            newlistx.append(newx)
+            newx = []
+            newlisty.append(newy)
+            newy = []
+
+        #print(newlistx)
+        #print(newlisty)
+        ''' for x in range(3):
+            plt.plot(newlistx[x], newlisty[x])
+        plt.show()'''
+
+    # Creating the new population
+    def createElitePopulation(initialPopulation, tempPopulation, nb, n):
+        temp = tempPopulation[:nb]
+        eliteList = []
+        for i in range(10):
+            index = (temp[i])[0]
+            eliteList.append(initialPopulation[index])
+        return eliteList
+        
+        
 
 # print(Algorithm.split_list(Population.initialPopulation(500, 3)))
 if __name__ == '__main__':
-
-    p = Problem("cidades29.tsp.txt", 3, 13)
 
     # Printing the initial population
     # print(Population.initialPopulation(500, p.vehicules, p.length, p.startingPoint))
 
     # Plot the data as a scatter plot
-    plt.scatter(p.x, p.y)
+    '''plt.scatter(p.x, p.y)
 
     # Add labels and a title
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
-    plt.title('Scatter plot')
+    plt.title('Scatter plot')'''
 
     # Show the plot
     # plt.show()
 
     # print(p.startingPoint)
+    nik=[]
     # Population.initialPopulation(500, p.vehicules, p.length, p.startingPoint)
-    list = Population.initialPopulation(500, p.vehicules, p.length, p.startingPoint)
-    print("1st List:")
-    print(list)
-    routesList = Algorithm.getRoutes(list, p.length)
-    listAfterSelection = Algorithm.selection(list, 500, p.x, p.y, p.startingPoint, p.length)
-    print("List after selection:")
-    print(listAfterSelection)
-    listAfterRecombination = Algorithm.populationAfterCrossover(listAfterSelection, 500)
-    print("List after recombination:")
-    print(listAfterRecombination)
-    listAfterMutation = Algorithm.populationAfterMutation(listAfterRecombination, 0.05)
-    print("List after mutation:")
-    print(listAfterMutation)
+    p = Problem("cidades29.tsp.txt", 3, 13)
+    initialPopulation = Population.initialPopulation(20, p.vehicules, p.length, p.startingPoint)
+    for i in range(10):
+        '''print("--======================================================---")
+        print(i)'''
+        print("--=========================jhfjfjhfjhfjk=============================---")
+        print(initialPopulation)
+        #routesList = Algorithm.getRoutes(initialPopulation, p.length)
+        listAfterSelection, fitnessList = Algorithm.selection(initialPopulation, 20, p.x, p.y, p.startingPoint, p.length)
+        # '''print("fitness List: ")
+        # print(fitnessList)'''
+        # '''print("length after selection:")
+        # print(len(listAfterSelection))'''
+        listAfterRecombination = Algorithm.populationAfterCrossover(listAfterSelection, 20)
+        # '''print("length after recombination:")
+        # print(len(listAfterRecombination))'''
+        listAfterMutation = Algorithm.populationAfterMutation(listAfterRecombination, 0.05)
+        # '''print("length after mutation:")
+        # print(len(listAfterMutation))'''
+        #ElitePopulation = Algorithm.createElitePopulation(initialPopulation, fitnessList, 10, 1)
+        # print("--======================================================---")
+        # print(ElitePopulation)
+        # print("--======================================================---")
+        initialPopulation = listAfterMutation
+        '''print("length:")
+        print(len(initialPopulation))'''
+        fList = Algorithm.fitnessList(initialPopulation, p.x, p.y, p.startingPoint, p.length, 20)
+        average = sum(fList) / len(fList)
+        '''print("Average: ")
+        print(average)
+        print("minimum: ")
+        print(min(fList))'''
+        nik.append(min(fList))
+        
+    plt.plot(nik)
+    plt.show()
+    
