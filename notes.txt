@@ -1,0 +1,5 @@
+What we need to do:
+1. We need to make a class (problem) that sotres the data from a file
+2. We need to make a class (population) in which we have to make an initial populaton
+    2.1. The initial population need individuals (500)
+    2.2. The individual 
