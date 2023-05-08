@@ -337,11 +337,13 @@ if __name__ == '__main__':
 
     # print(p.startingPoint)
     nik=[]
+    nik1=[]
+
     # Population.initialPopulation(500, p.vehicules, p.length, p.startingPoint)
     p = Problem("cidades29.tsp.txt", 3, 13)
     initialPopulation = Population.initialPopulation(500, p.vehicules, p.length, p.startingPoint)
     initialPopulationCopy=initialPopulation.copy()
-    for i in range(1000):
+    for i in range(500):
         '''print("--======================================================---")
         print(i)'''
         print("--=========================jhfjfjhfjhfjk=============================---")
@@ -354,17 +356,17 @@ if __name__ == '__main__':
         # print(fitnessList)'''
         # '''print("length after selection:")
         # print(len(listAfterSelection))'''
-        listAfterRecombination = Algorithm.populationAfterCrossover(listAfterSelection, 490)
+        listAfterRecombination = Algorithm.populationAfterCrossover(listAfterSelection, 400)
         # '''print("length after recombination:")
         # print(len(listAfterRecombination))'''
-        #listAfterMutation = Algorithm.populationAfterMutation(initialPopulation, 0.05)
+        listAfterMutation = Algorithm.populationAfterMutation(listAfterRecombination, 0.05)
         # '''print("length after mutation:")
         # print(len(listAfterMutation))'''
-        ElitePopulation = Algorithm.createElitePopulation(initialPopulation, fitnessList, 10)
+        ElitePopulation = Algorithm.createElitePopulation(initialPopulation, fitnessList, 100)
         # print("--======================================================---")
         # print(ElitePopulation)
         # print("--======================================================---")
-        initialPopulation = ElitePopulation+listAfterRecombination
+        initialPopulation = ElitePopulation+listAfterMutation
         print("KHOUYA",len(initialPopulation))
         # print("zeby",len(listAfterMutation))
         # print("ELITEzeby",len(ElitePopulation))
@@ -372,14 +374,18 @@ if __name__ == '__main__':
         '''print("length:")
         print(len(initialPopulation))'''
         fList = Algorithm.fitnessList(initialPopulation, p.x, p.y, p.startingPoint, p.length, 500)#initial pop value + elite length
-        # average = sum(fList) / len(fList)
+        average = sum(fList) / len(fList)
         '''print("Average: ")
         print(average)
         print("minimum: ")
         print(min(fList))'''
         print("9a7ba",min(fList))
-        nik.append(min(fList))
+        nik1.append(min(fList))
+        nik.append(average)
+
         
     plt.plot(nik)
+    plt.plot(nik1)
+
     plt.show()
     
