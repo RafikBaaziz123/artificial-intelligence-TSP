@@ -132,6 +132,7 @@ class Algorithm:
                 fitness_value_index.append(fitnessValue2)
                 fitnessList.append(fitness_value_index)
         fitnessList = sorted(fitnessList, key=lambda x: x[1])
+
         return finalList, fitnessList
 
     # The Crossover function
@@ -274,8 +275,7 @@ class Algorithm:
     def populationAfterMutation(initialPopulation, rate):
         listAfterMutation = []
         for individual in initialPopulation:
-            listAfterMutation.append(
-                Algorithm.individualMutation(individual, rate))
+            listAfterMutation.append(Algorithm.individualMutation(individual, rate))
         return listAfterMutation
     
     # 
@@ -305,12 +305,15 @@ class Algorithm:
         plt.show()'''
 
     # Creating the new population
-    def createElitePopulation(initialPopulation, tempPopulation, nb, n):
+    def createElitePopulation(initialPopulation, tempPopulation, nb):
+        # tempPopulation = sorted(tempPopulation, key=lambda x: x[0])
         temp = tempPopulation[:nb]
+        
         eliteList = []
-        for i in range(10):
-            index = (temp[i])[0]
-            eliteList.append(initialPopulation[index])
+        for i in range(nb):
+            index = temp[i][0]
+            eliteList.append(initialPopulation[index-1])#always -1
+         
         return eliteList
         
         
@@ -336,37 +339,45 @@ if __name__ == '__main__':
     nik=[]
     # Population.initialPopulation(500, p.vehicules, p.length, p.startingPoint)
     p = Problem("cidades29.tsp.txt", 3, 13)
-    initialPopulation = Population.initialPopulation(20, p.vehicules, p.length, p.startingPoint)
-    for i in range(10):
+    initialPopulation = Population.initialPopulation(500, p.vehicules, p.length, p.startingPoint)
+    initialPopulationCopy=initialPopulation.copy()
+    for i in range(1000):
         '''print("--======================================================---")
         print(i)'''
         print("--=========================jhfjfjhfjhfjk=============================---")
-        print(initialPopulation)
+
         #routesList = Algorithm.getRoutes(initialPopulation, p.length)
-        listAfterSelection, fitnessList = Algorithm.selection(initialPopulation, 20, p.x, p.y, p.startingPoint, p.length)
+        listAfterSelection, fitnessList = Algorithm.selection(initialPopulation, 500, p.x, p.y, p.startingPoint, p.length)
+        # initialPopulation=listAfterSelection.copy()
+
         # '''print("fitness List: ")
         # print(fitnessList)'''
         # '''print("length after selection:")
         # print(len(listAfterSelection))'''
-        listAfterRecombination = Algorithm.populationAfterCrossover(listAfterSelection, 20)
+        listAfterRecombination = Algorithm.populationAfterCrossover(listAfterSelection, 490)
         # '''print("length after recombination:")
         # print(len(listAfterRecombination))'''
-        listAfterMutation = Algorithm.populationAfterMutation(listAfterRecombination, 0.05)
+        #listAfterMutation = Algorithm.populationAfterMutation(initialPopulation, 0.05)
         # '''print("length after mutation:")
         # print(len(listAfterMutation))'''
-        #ElitePopulation = Algorithm.createElitePopulation(initialPopulation, fitnessList, 10, 1)
+        ElitePopulation = Algorithm.createElitePopulation(initialPopulation, fitnessList, 10)
         # print("--======================================================---")
         # print(ElitePopulation)
         # print("--======================================================---")
-        initialPopulation = listAfterMutation
+        initialPopulation = ElitePopulation+listAfterRecombination
+        print("KHOUYA",len(initialPopulation))
+        # print("zeby",len(listAfterMutation))
+        # print("ELITEzeby",len(ElitePopulation))
+
         '''print("length:")
         print(len(initialPopulation))'''
-        fList = Algorithm.fitnessList(initialPopulation, p.x, p.y, p.startingPoint, p.length, 20)
-        average = sum(fList) / len(fList)
+        fList = Algorithm.fitnessList(initialPopulation, p.x, p.y, p.startingPoint, p.length, 500)#initial pop value + elite length
+        # average = sum(fList) / len(fList)
         '''print("Average: ")
         print(average)
         print("minimum: ")
         print(min(fList))'''
+        print("9a7ba",min(fList))
         nik.append(min(fList))
         
     plt.plot(nik)
