@@ -271,14 +271,14 @@ class Algorithm:
                 individual[city_index_to_switch] = city1
         return individual  # return list after mutation
 
-    #
+    
     def populationAfterMutation(initialPopulation, rate):
         listAfterMutation = []
         for individual in initialPopulation:
             listAfterMutation.append(Algorithm.individualMutation(individual, rate))
         return listAfterMutation
     
-    # 
+    
     def drawingPoints(liste1, xlist, ylist, startingPoint):
         newx = []
         newy = []
@@ -290,23 +290,20 @@ class Algorithm:
             sublist.append(startingPoint)
             for j in sublist:
                 if j not in [30, 31]:
-                    #print("hedhy j ", j)
                     newx.append(xlist[j-1])
                     newy.append(ylist[j-1])
             newlistx.append(newx)
             newx = []
             newlisty.append(newy)
             newy = []
-
-        #print(newlistx)
-        #print(newlisty)
-        ''' for x in range(3):
+        for x in range(3):
             plt.plot(newlistx[x], newlisty[x])
-        plt.show()'''
+        plt.show()
+
+ 
 
     # Creating the new population
     def createElitePopulation(initialPopulation, tempPopulation, nb):
-        # tempPopulation = sorted(tempPopulation, key=lambda x: x[0])
         temp = tempPopulation[:nb]
         
         eliteList = []
@@ -318,74 +315,44 @@ class Algorithm:
         
         
 
-# print(Algorithm.split_list(Population.initialPopulation(500, 3)))
 if __name__ == '__main__':
 
-    # Printing the initial population
-    # print(Population.initialPopulation(500, p.vehicules, p.length, p.startingPoint))
 
     # Plot the data as a scatter plot
-    '''plt.scatter(p.x, p.y)
-
-    # Add labels and a title
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('Scatter plot')'''
-
-    # Show the plot
-    # plt.show()
-
-    # print(p.startingPoint)
-    nik=[]
-    nik1=[]
+    average_graph=[]
+    minimum_graph=[]
 
     # Population.initialPopulation(500, p.vehicules, p.length, p.startingPoint)
     p = Problem("cidades29.tsp.txt", 3, 13)
     initialPopulation = Population.initialPopulation(500, p.vehicules, p.length, p.startingPoint)
-    initialPopulationCopy=initialPopulation.copy()
-    for i in range(500):
-        '''print("--======================================================---")
-        print(i)'''
-        print("--=========================jhfjfjhfjhfjk=============================---")
-
-        #routesList = Algorithm.getRoutes(initialPopulation, p.length)
+    v1 = 200 #number of rest (initial population - elite )
+    v2 = 300 #number of elite
+    for i in range(1000):
+       
         listAfterSelection, fitnessList = Algorithm.selection(initialPopulation, 500, p.x, p.y, p.startingPoint, p.length)
-        # initialPopulation=listAfterSelection.copy()
-
-        # '''print("fitness List: ")
-        # print(fitnessList)'''
-        # '''print("length after selection:")
-        # print(len(listAfterSelection))'''
-        listAfterRecombination = Algorithm.populationAfterCrossover(listAfterSelection, 400)
-        # '''print("length after recombination:")
-        # print(len(listAfterRecombination))'''
+     
+        listAfterRecombination = Algorithm.populationAfterCrossover(listAfterSelection, v1)
+    
         listAfterMutation = Algorithm.populationAfterMutation(listAfterRecombination, 0.05)
-        # '''print("length after mutation:")
-        # print(len(listAfterMutation))'''
-        ElitePopulation = Algorithm.createElitePopulation(initialPopulation, fitnessList, 100)
-        # print("--======================================================---")
-        # print(ElitePopulation)
-        # print("--======================================================---")
-        initialPopulation = ElitePopulation+listAfterMutation
-        print("KHOUYA",len(initialPopulation))
-        # print("zeby",len(listAfterMutation))
-        # print("ELITEzeby",len(ElitePopulation))
 
-        '''print("length:")
-        print(len(initialPopulation))'''
+      
+        ElitePopulation = Algorithm.createElitePopulation(initialPopulation, fitnessList, v2)
+      
+        initialPopulation = ElitePopulation+listAfterMutation
+       
         fList = Algorithm.fitnessList(initialPopulation, p.x, p.y, p.startingPoint, p.length, 500)#initial pop value + elite length
         average = sum(fList) / len(fList)
-        '''print("Average: ")
-        print(average)
-        print("minimum: ")
-        print(min(fList))'''
-        print("9a7ba",min(fList))
-        nik1.append(min(fList))
-        nik.append(average)
+      
+        minimum_graph.append(min(fList))
+        average_graph.append(average)
 
-        
-    plt.plot(nik)
-    plt.plot(nik1)
+    index = fList.index(min(fList))
+    bestSolution = initialPopulation[index]
+    bestSolutionRoutes = Algorithm.route(bestSolution, p.length)
+    Algorithm.drawingPoints(bestSolutionRoutes, p.x, p.y, p.startingPoint)
+
+    plt.plot(average_graph)
+    plt.plot(minimum_graph)
 
     plt.show()
     
